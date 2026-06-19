@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { uploadToCloudinary } from "../api/cloudinary";
+import { uploadToCloudinary, uploadImageToCloudinary } from "../api/cloudinary";
 import { createSlide } from "../api/slides";
 
 export default function Upload() {
@@ -26,7 +26,7 @@ export default function Upload() {
             let previewImage = "";
             if (previewFile) {
                 setStatus("Uploading preview image...");
-                previewImage = await uploadToCloudinary(previewFile, "previews");
+                previewImage = await uploadImageToCloudinary(previewFile, "previews");
             }
 
             setStatus("Saving to database...");

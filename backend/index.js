@@ -52,7 +52,7 @@ app.post("/api/auth/login", async (req, res) => {
 
 app.post("/api/sign-url", authMiddleware, (req, res) => {
   try {
-    const { folder = "slides", public_id } = req.body;
+    const { folder = "slides", public_id, resourceType = "raw" } = req.body;
 
     const timestamp = Math.round(Date.now() / 1000);
 
@@ -73,6 +73,7 @@ app.post("/api/sign-url", authMiddleware, (req, res) => {
       cloudName: process.env.CLOUDINARY_CLOUD_NAME,
       apiKey: process.env.CLOUDINARY_API_KEY,
       folder,
+      resourceType,
     });
   } catch (err) {
     res.status(500).json({ message: "Could not generate signature", error: err.message });

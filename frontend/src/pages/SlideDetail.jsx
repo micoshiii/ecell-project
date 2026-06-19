@@ -147,6 +147,7 @@ export default function SlideDetail() {
 
                                 <div className="flex gap-3 flex-wrap">
                                     
+                                        <a
                                         href={slide.slideUrl}
                                         target="_blank"
                                         rel="noreferrer"
