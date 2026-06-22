@@ -1,6 +1,7 @@
 const express = require("express");
 const { authMiddleware } = require("./middleware");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 const { connectDB, userModel, slideModel } = require("./models");
@@ -30,18 +31,22 @@ app.post("/api/auth/register", async (req, res) => {
   if (userExists)
     return res.status(403).json({ message: "User already exists" });
 
-  const newUser = await userModel.create({ username, password });
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await userModel.create({ username, password: hashedPassword });
+  
   res.json({ id: newUser._id });
 });
 
 app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await userModel.findOne({ username, password });
-  if (!user)
-    return res.status(403).json({ message: "Incorrect credentials" });
+  const user = await userModel.findOne({ username });
+  if (!user) return res.status(403).json({ message: "Incorrect credentials" });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+  const isPasswordCorrect = await bcrypt.compare(password, user.password); 
+  if (!isPasswordCorrect) return res.status(403).json({ message: "Incorrect credentials" }); 
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" }); //expiry added
+
   res.json({ token });
 });
 
